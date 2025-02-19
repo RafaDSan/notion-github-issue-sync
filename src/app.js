@@ -19,10 +19,6 @@ export const initializeApp = async () => {
     }
   })
 
-  // app.webhooks.on('issues.opened', handleIssueOpened);
-  // app.webhooks.on('issues.closed',handleIssueStateChanged);
-  // app.webhooks.on('pull_request.opened', handlePullRequestOpened);
-
   // Error handling
   app.webhooks.onError((error) => {
     console.error('Webhook error details:', {

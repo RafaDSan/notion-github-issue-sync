@@ -39,7 +39,6 @@ export const handleIssueOpened = async ({ payload }) => {
 export const handleIssueStateChanged = async ({ payload }) => {
   console.log('Processing state change:', {
     number: payload.issue.number,
-    oldState: payload.changes?.state?.from,
     newState: payload.issue.state,
     assignee: payload.issue.assignee?.login,
     closedAt: payload.issue.closed_at
@@ -63,7 +62,6 @@ export const handleIssueStateChanged = async ({ payload }) => {
         console.log('Notion record state updated:', {
           issueNumber: payload.issue.number,
           notionPageId: result.id,
-          oldState: payload.changes?.state?.from,
           newState: payload.issue.state,
           closedAt: payload.issue.closed_at
         })
