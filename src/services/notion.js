@@ -116,33 +116,6 @@ export const getValidStatus = async (githubState) => {
     return 'Not started'
   }
 }
-// async function getValidStatus(githubState) {
-//     try {
-//         const database = await notion.databases.retrieve({
-//             database_id: notionDatabaseId
-//         });
-
-//         const statusProperty = database.properties['Status'];
-//         if (!statusProperty || statusProperty.type !== 'status') {
-//             throw new Error ('Status property not found or is not of type "status"');
-//         }
-
-//         const validStatuses = statusProperty.status.options.map(option => option.name);
-//         const mappedStatus = statusMapping[githubState];
-//         console.log("validStatuses: ", validStatuses);
-//         console.log("mappedStatus: ", mappedStatus)
-
-//         if (!validStatuses.includes(mappedStatus)) {
-//             console.warn(`Warning: Status "${mappedStatus}" not found in Notion database. Valid options are ${validStatuses.join(', ')}`)
-//             return validStatuses[0];
-//         }
-
-//         return mappedStatus;
-//     } catch (error) {
-//         console.error('Error validating status:', error);
-//         return 'Not started';
-//     }
-// }
 
 export const createNotionRecord = async (issue) => {
   try {
