@@ -6,6 +6,7 @@ const notion = new Client({ auth: notionKey });
 const statusMapping = {
     'open': 'Open',
     'closed': 'Done',
+    'reopened': 'Open',
 }
 
 // This function checks if an issue already exists in the Notion database
@@ -55,17 +56,29 @@ export const updateStatus = async (issue) => {
         const status = await getValidStatus(issue.state);
 
         console.log('Updating record:', {
-            issueNumber: issue.number
+            issueNumber: issue.number,
+            status: status,
+            closedAt: issue.date === 'closed' ? issue.closedAt : null
         });
+
+        const updateProperties = {
+            'Status': {
+                status: { name: status },
+            }
+        }
+
+        if (issue.state === 'closed' && issue.closedAt) {
+            updateProperties['ClosedAt'] = {
+                date: {
+                    start: issue.closedAt
+                }
+            };
+        }
 
         // Perform the update with the page_id
         const response = await notion.pages.update({
             page_id: pageId,
-            properties: {
-                'Status': {
-                    status: { name: status },
-                }
-            }
+            properties: updateProperties
         });
         
         console.log(`Updated status for issue #${issue.number} to: ${status}`);
@@ -166,28 +179,37 @@ export const createNotionRecord = async (issue) => {
         //If no existing record, create a new one
         const status = await getValidStatus(issue.state);
 
+        const properties = {
+            'Title': {
+                title: [{ text: { content: issue.title } }],
+            },
+            'Status': {
+                status: { name: status },
+            },
+            'Github Issue Number': {
+                number: issue.number,
+            },
+            'Github URL': {
+                url: issue.html_url,
+            },
+            'Repository': {
+                rich_text: [{ text: { content: issue.repository } }],
+            },
+            'CreatedAt': {
+                date: { start: issue.createdAt },
+            },
+        };
+
+        // Add ClosedAt if the issue is already closed when created
+        if (issue.state === 'closed' && issue.closedAt) {
+            properties['ClosedAt'] = {
+                date: { start: issue.closedAt }
+            };
+        }
+
         const response = await notion.pages.create({
             parent: { database_id: notionDatabaseId },
-            properties: {
-                'Title': {
-                    title: [{ text: { content: issue.title } }],
-                },
-                'Status': {
-                    status: { name: status },
-                },
-                'Github Issue Number': {
-                    number: issue.number,
-                },
-                'Github URL': {
-                    url: issue.html_url,
-                },
-                'Repository': {
-                    rich_text: [{ text: { content: issue.repository } }],
-                },
-                'CreatedAt': {
-                    date: {start: issue.createdAt},
-                },
-            },
+            properties: properties,
         });
 
         console.log(`Created new Notion record for issue #${issue.number} with status ${status}`);

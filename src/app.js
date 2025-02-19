@@ -10,9 +10,19 @@ export const initializeApp = async () => {
   console.log('Registering webhook handlers...');
 
   // Subscribe to events
-  app.webhooks.on('issues.opened', handleIssueOpened);
-  app.webhooks.on('issues.closed',handleIssueStateChanged);
-  app.webhooks.on('pull_request.opened', handlePullRequestOpened);
+  app.webhooks.on('issues', async ({ payload }) => {
+    if (payload.action === 'opened') {
+      await handleIssueOpened({ payload });
+    } else if (payload.action === 'closed') {
+      await handleIssueStateChanged({ payload });
+    } else if (payload.action === 'reopened') {
+      await handleIssueStateChanged({ payload });
+    }
+  });
+
+  // app.webhooks.on('issues.opened', handleIssueOpened);
+  // app.webhooks.on('issues.closed',handleIssueStateChanged);
+  // app.webhooks.on('pull_request.opened', handlePullRequestOpened);
 
     //Error handling
     app.webhooks.onError((error) => {

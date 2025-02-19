@@ -10,11 +10,9 @@ export const handleIssueOpened = async ({ payload }) => {
 
     if (payload.issue.assignee && payload.issue.assignee.login === "RafaDSan") {
         try {
-            const status = getValidStatus(payload.issue.state);
-
             const issueData = {
                 title: payload.issue.title,
-                state: status,
+                state: payload.issue.state,
                 number: payload.issue.number,
                 html_url: payload.issue.html_url,
                 repository: `${payload.repository.owner.login}/${payload.repository.name}`,
@@ -79,7 +77,8 @@ export const handleIssueStateChanged = async ({ payload }) => {
         number: payload.issue.number,
         oldState: payload.changes?.state?.from,
         newState: payload.issue.state,
-        assignee: payload.issue.assignee?.login
+        assignee: payload.issue.assignee?.login,
+        closedAt: payload.issue.closed_at
     });
 
     if (payload.issue.assignee && payload.issue.assignee.login === "RafaDSan") {
@@ -91,6 +90,7 @@ export const handleIssueStateChanged = async ({ payload }) => {
                 html_url: payload.issue.html_url,
                 repository: `${payload.repository.owner.login}/${payload.repository.name}`,
                 createdAt: payload.issue.created_at,
+                closedAt: payload.issue.closed_at
             };
 
             const result = await updateStatus(issueData);
@@ -100,7 +100,8 @@ export const handleIssueStateChanged = async ({ payload }) => {
                     issueNumber: payload.issue.number,
                     notionPageId: result.id,
                     oldState: payload.changes?.state?.from,
-                    newState: payload.issue.state
+                    newState: payload.issue.state,
+                    closedAt: payload.issue.closed_at
                 });
             } else {
                 console.log(`No existing record found for issue #${payload.issue.number}`);
