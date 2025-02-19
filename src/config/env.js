@@ -11,3 +11,4 @@ export const notionDatabaseId = process.env.NOTION_DATABASE_ID;
 export const webhookProxyUrl = process.env.WEBHOOK_PROXY_URL;
 export const port = process.env.PORT || 3000;
 export const path = '/api/webhook';
+export const githubToken = process.env.GITHUB_TOKEN;
