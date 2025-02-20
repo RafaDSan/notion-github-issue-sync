@@ -5,11 +5,16 @@ import { handleIssueOpened, handleIssueStateChanged } from './handlers/issues.js
 export const initializeApp = async () => {
   const app = await githubApp
 
-  // Debug logging for webhook registration
   console.log('Registering webhook handlers...')
 
-  // Subscribe to events
+  // Subscribe to issue events (excluding pull requests, which use a different webhook event type)
   app.webhooks.on('issues', async ({ payload }) => {
+    // Verify this is an actual issue, not a pull request
+    if (payload.issue.pull_request) {
+      console.log('Skipping pull request:', payload.issue.number)
+      return
+    }
+
     if (payload.action === 'opened') {
       await handleIssueOpened({ payload })
     } else if (payload.action === 'closed') {

@@ -52,7 +52,10 @@ export const fetchIssues = async (owner, repo) => {
       repo,
       state: 'all'
     })
-    return response.data
+    
+    // Filter out pull requests by only keeping items that don't have a pull_request property
+    const issuesOnly = response.data.filter(item => !item.pull_request)
+    return issuesOnly
   } catch (error) {
     console.error('Error fetching issues:', error)
     throw error
